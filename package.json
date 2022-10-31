@@ -1,0 +1,27 @@
+{
+  "name": "storage-functions",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start:metadata": "npx functions-framework --target metadata-events",
+    "start:compress": "npx functions-framework --target compress",
+    "start:grayscale": "npx functions-framework --target grayscale",
+    "deploy": "npm run deploy:compress && npm run deploy:grayscale && npm run deploy:metadata",
+    "deploy:grayscale": "gcloud functions deploy storage-functions-grayscale --gen2 --max-instances 5 --memory=512Mi --runtime=nodejs16 --region=southamerica-east1 --source=. --entry-point=grayscale --trigger-event-filters='type=google.cloud.storage.object.v1.finalized' --trigger-event-filters='bucket=photos-dump'",
+    "deploy:compress": "gcloud functions deploy storage-functions-compress --gen2 --max-instances 5 --memory=512Mi --runtime=nodejs16 --region=southamerica-east1 --source=. --entry-point=compress --trigger-event-filters='type=google.cloud.storage.object.v1.finalized' --trigger-event-filters='bucket=photos-dump'",
+    "deploy:metadata": "gcloud functions deploy storage-functions-metadata-events --gen2 --max-instances 5 --memory=256Mi --runtime=nodejs16 --region=southamerica-east1 --source=. --entry-point=metadata-events --trigger-topic=storage-functions-metadata-events"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.1.2",
+    "@google-cloud/logging-winston": "^5.1.7",
+    "@google-cloud/pubsub": "^3.2.0",
+    "@google-cloud/storage": "^6.5.4",
+    "firebase-admin": "^11.2.0",
+    "sharp": "^0.31.1",
+    "uuid": "^9.0.0",
+    "winston": "^3.8.2"
+  }
+}
